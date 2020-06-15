@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 void main() => runApp(MyApp());
+List<String> _data;
 
 class MyApp extends StatelessWidget {
   // This widget is the root of your application.
@@ -45,6 +48,7 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
+  List<String> _data;
 
   void _incrementCounter() {
     setState(() {
@@ -108,4 +112,28 @@ class _MyHomePageState extends State<MyHomePage> {
       ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
+
+  void fetchPosts() async {
+    const url = 'https://jsonplaceholder.typicode.com/posts';
+    http.get(url)
+        .then((response) {
+      print("Response status: ${response.statusCode}");
+      print("Response body: ${response.body}");
+      setState(() {
+        List list = json.decode(response.body);
+        _data = list.map<String>((value) {
+          return value['title'];
+        }).toList();
+      });
+    });
+  }
+
+  @override
+  void initState() {
+    _data = [];
+    fetchPosts();
+
+    super.initState();
+  }
+
 }
